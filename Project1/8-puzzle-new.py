@@ -4,6 +4,7 @@ initialState = [[0 for i in range(3)] for j in range(3)];
 goalState = [[0 for i in range(3)] for j in range(3)];
 queue = [];
 prevNodes = [];
+total = 1;
 
 class state:
     def __init__(self, array, path_prevNodes, prevActions, cost, heur):
@@ -21,7 +22,7 @@ def generateChildren(expandNode, newArray, cost, action, mode):
     newState = state(newArray, newPrevNodes, newPrevActions, cost + 1, heuristic(mode, newArray));
     return newState;
 
-def next(queue, mode):
+def next(queue, mode, total):
     expandNode = queue.pop(0);
     #print('exapnd:', expandNode.array);
     i, j = pos(expandNode.array);
@@ -37,6 +38,7 @@ def next(queue, mode):
             #print('newState:', newState.array);
             queue.append(newState);
             prevNodes.append(newState.array);
+            total += 1;
             #print(queue[0].array);
 
     if i > 0:
@@ -48,7 +50,7 @@ def next(queue, mode):
             newState = generateChildren(copy_expandNode, newArray, expandNode.cost, 'U', mode);
             queue.append(newState);
             prevNodes.append(newState.array);
-
+            total += 1;
 
     if j < 2:
         temp = copy.deepcopy(expandNode.array);
@@ -59,7 +61,7 @@ def next(queue, mode):
             newState = generateChildren(copy_expandNode, newArray, expandNode.cost, 'R', mode);
             queue.append(newState);
             prevNodes.append(newState.array);
-
+            total += 1;
 
     if j > 0:
         temp = copy.deepcopy(expandNode.array);
@@ -70,7 +72,8 @@ def next(queue, mode):
             newState = generateChildren(copy_expandNode, newArray, expandNode.cost, 'L', mode);
             queue.append(newState);
             prevNodes.append(newState.array);
-
+            total += 1;
+    return total;
     #print('expandNodeTest:', expandNode.array);
 
 
@@ -173,14 +176,14 @@ def countReverse(lst1, lst2):
                     index_array.append(i);
                     index_array.append(j);
         if num_same == 2:
-            if index_array[3] < index_array[1]:
+            if (index_array[0] < index_array[1]) and (index_array[2] > index_array[3]):
                 count += 1;
         else:
-            if index_array[3] < index_array[1]:
+            if (index_array[0] < index_array[1]) and (index_array[2] > index_array[3]):
                 count += 1;
-            if index_array[5] < index_array[1]:
+            if (index_array[2] < index_array[3]) and (index_array[4] > index_array[5]):
                 count += 1;
-            if index_array[5] < index_array[3]:
+            if (index_array[0] < index_array[1]) and (index_array[4] > index_array[5]):
                 count += 1;
     return count;
 
@@ -217,15 +220,14 @@ def main():
     currentState = state(currentArray, [], [], 0, heuristic(mode, currentArray));
     queue.append(currentState);
 
-    numNodes = next(queue, mode);
+    numNodes = next(queue, mode, total);
     queue.sort(key = lambda x: x.cost + x.heur);
     #for i in queue:
         #print(i.array, i.prevArray, i.prevActions);
-    index = 0;
-    while queue[0].array != goalState and index < 50:
-        numNodes = next(queue, mode);
+
+    while queue[0].array != goalState:
+        numNodes = next(queue, mode, numNodes);
         queue.sort(key = lambda x: x.cost + x.heur);
-        index += 1;
         #print(queue[0].array);
         #for i in queue:
             #print('in queue:', i.array, i.prevActions, i.cost+i.heur);
@@ -233,7 +235,7 @@ def main():
 
     resNode = queue[0];
     print(resNode.cost);
-    print(len(prevNodes));
+    print(len(prevNodes), numNodes);
     print(' '.join(resNode.prevActions));
     lst = [];
     for i in resNode.path_prevNodes:
