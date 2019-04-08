@@ -176,14 +176,14 @@ def countReverse(lst1, lst2):
                     index_array.append(i);
                     index_array.append(j);
         if num_same == 2:
-            if (index_array[0] < index_array[1]) and (index_array[2] > index_array[3]):
+            if (index_array[0] < index_array[2]) and (index_array[1] > index_array[3]):
                 count += 1;
         else:
-            if (index_array[0] < index_array[1]) and (index_array[2] > index_array[3]):
+            if (index_array[0] < index_array[2]) and (index_array[1] > index_array[3]):
                 count += 1;
-            if (index_array[2] < index_array[3]) and (index_array[4] > index_array[5]):
+            if (index_array[2] < index_array[4]) and (index_array[3] > index_array[5]):
                 count += 1;
-            if (index_array[0] < index_array[1]) and (index_array[4] > index_array[5]):
+            if (index_array[0] < index_array[2]) and (index_array[3] > index_array[5]):
                 count += 1;
     return count;
 
@@ -235,7 +235,7 @@ def main():
 
     resNode = queue[0];
     print(resNode.cost);
-    print(len(prevNodes), numNodes);
+    print(len(prevNodes));
     print(' '.join(resNode.prevActions));
     lst = [];
     for i in resNode.path_prevNodes:
