@@ -6,14 +6,16 @@ queue = [];
 prevNodes = [];
 total = 1;
 
+#each state is represented by a class
 class state:
     def __init__(self, array, path_prevNodes, prevActions, cost, heur):
-        self.array = array;
-        self.path_prevNodes = path_prevNodes;
+        self.array = array;     #the matrix in current node
+        self.path_prevNodes = path_prevNodes;       #previous node above it
         self.prevActions = prevActions;
         self.cost = cost;
         self.heur = heur;
 
+#generate the next node
 def generateChildren(expandNode, newArray, cost, action, mode):
     newPrevNodes = expandNode.path_prevNodes;
     newPrevNodes.append(expandNode);
@@ -22,24 +24,22 @@ def generateChildren(expandNode, newArray, cost, action, mode):
     newState = state(newArray, newPrevNodes, newPrevActions, cost + 1, heuristic(mode, newArray));
     return newState;
 
+#expand the current node
 def next(queue, mode, total):
     expandNode = queue.pop(0);
-    #print('exapnd:', expandNode.array);
+
     i, j = pos(expandNode.array);
-    #print(i, j);
+
 
     if i < 2:
         temp = copy.deepcopy(expandNode.array);
         newArray = up(i, j, temp);
         if newArray not in prevNodes:
-            #print("newArray:", newArray);
             copy_expandNode = copy.deepcopy(expandNode);
             newState = generateChildren(copy_expandNode, newArray, expandNode.cost, 'D', mode);
-            #print('newState:', newState.array);
             queue.append(newState);
             prevNodes.append(newState.array);
             total += 1;
-            #print(queue[0].array);
 
     if i > 0:
         temp = copy.deepcopy(expandNode.array);
@@ -74,37 +74,37 @@ def next(queue, mode, total):
             prevNodes.append(newState.array);
             total += 1;
     return total;
-    #print('expandNodeTest:', expandNode.array);
 
 
-
-
+#determine the position of 0
 def pos(array):
     for i in range(3):
         for j in range(3):
             if array[i][j] == '0':
                 return i, j;
 
+#move down
 def up(i, j, array):
     #print('up');
     array[i][j] = array[i + 1][j];
     array[i + 1][j] = '0';
     return array;
 
+#move up
 def down(i, j, array):
     #print('down');
     array[i][j] = array[i - 1][j];
     array[i - 1][j] = '0';
     return array;
 
-
+#move right
 def left(i, j, array):
     #print('left');
     array[i][j] = array[i][j + 1];
     array[i][j + 1] = '0';
     return array;
 
-
+#move left
 def right(i, j, array):
     #print('right');
     array[i][j] = array[i][j - 1];
@@ -158,7 +158,7 @@ def linearConlict(currentArray):
         count += countReverse(init_col[i], goal_col[i]);
     return count;
 
-
+#count numbers that are in reverse order in one line
 def countReverse(lst1, lst2):
     num_same = 0;
     index_array = []
@@ -187,6 +187,7 @@ def countReverse(lst1, lst2):
                 count += 1;
     return count;
 
+#switch mode here
 def heuristic(mode, array):
     if mode == 'M':
         return sumManhattan(array);
@@ -197,24 +198,26 @@ def heuristic(mode, array):
 def main():
     print("Please enter the name of the input file:");
     file_name = input();
-    #file_name = 'input2.txt';
+    print("Please enter the name of the output file:");
+    outputFileName = input();
     readfile(file_name);
     print("Please choose your heuristic function:\nManhattan distance(M) Manhattan distance+2*LinearConlict(L):");
     mode = input();
     sumMan = sumManhattan(initialState);
-    #print('ManSum:', sumMan);
-    #print(linearConlict(initialState));
-
-    #print('Queue:', queue);
+    outputFile = open(outputFileName, "w");
 
     for i in initialState:
+        outputFile.write(' '.join(i));
         print(' '.join(i));
+        outputFile.write("\n");
+    outputFile.write("\n");
     print();
     for i in goalState:
+        outputFile.write(' '.join(i));
         print(' '.join(i));
+        outputFile.write("\n");
+    outputFile.write("\n");
     print();
-
-
 
     currentArray = copy.deepcopy(initialState);
     currentState = state(currentArray, [], [], 0, heuristic(mode, currentArray));
@@ -222,18 +225,17 @@ def main():
 
     numNodes = next(queue, mode, total);
     queue.sort(key = lambda x: x.cost + x.heur);
-    #for i in queue:
-        #print(i.array, i.prevArray, i.prevActions);
 
     while queue[0].array != goalState:
         numNodes = next(queue, mode, numNodes);
         queue.sort(key = lambda x: x.cost + x.heur);
-        #print(queue[0].array);
-        #for i in queue:
-            #print('in queue:', i.array, i.prevActions, i.cost+i.heur);
-        #print();
 
     resNode = queue[0];
+    outputFile.write(str(resNode.cost));
+    outputFile.write("\n");
+    outputFile.write(str(len(prevNodes)));
+    outputFile.write("\n");
+    outputFile.write(' '.join(resNode.prevActions));
     print(resNode.cost);
     print(len(prevNodes));
     print(' '.join(resNode.prevActions));
@@ -241,6 +243,10 @@ def main():
     for i in resNode.path_prevNodes:
         #print(i.cost, i.heur);
         lst.append(str(i.heur + i.cost));
+    outputFile.write("\n");
+    outputFile.write(' '.join(lst))
+    outputFile.close();
+
     print(' '.join(lst));
 
 
