@@ -281,10 +281,9 @@ def main():
 	for i in range(81):
 		domain.append({"1", "2", "3", "4", "5", "6", "7", "8", "9"});
 	state_new = state(sudoku_lst, domain);
-	#print(state_new.forwardChecking());
-	#print(state_new.nextCell());
+
 	res = state_new.search();
-	f = open("Output", "w+");
+	f = open("Output3", "w+"); #change your output file name
 	if res == None:
 		f.write(None);
 	else:
